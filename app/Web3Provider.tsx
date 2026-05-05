@@ -11,7 +11,7 @@ const metadata = {
   name: 'Base Inscriptions', 
   description: 'Fair Launch on Base', 
   // ✅ 修改这里：动态获取当前域名，适配本地和 Vercel 线上环境
-  url: typeof window !== 'undefined' ? window.location.origin : 'https://base-launchpad-omega.vercel.app', 
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://www.asteroidonbase.fun', 
   icons: ['https://avatars.githubusercontent.com/u/37784886'] 
 };
 
