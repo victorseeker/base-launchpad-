@@ -5,7 +5,7 @@ import { base } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // 🌟 这里保持你的 ProjectId 不变
-const projectId = 'b56e4a2431478229b936d812bd529729'; 
+const projectId = 'e2e0bc536eda364c6dd67bf0dc76cef1'; 
 
 const metadata = { 
   name: 'Base Inscriptions', 
