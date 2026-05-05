@@ -11,6 +11,9 @@ const TREASURY_ADDRESS = "0xb49d859f99c3090613d2aeb80ef522b75b1b5f4e";
 // 🌟 [配置] 市场开关：手动修改这里即可开启/关闭市场
 const IS_MARKET_ENABLED = false; 
 
+// 从环境变量获取后端地址
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const locales = {
   zh: {
     tabMint: '🚀 轨道发射',
@@ -28,7 +31,7 @@ const locales = {
     mintBtn: '点火发射 (0.0005 ETH)',
     deployBtn: '+ 部署卖单',
     noOrders: '太空深处静悄悄，暂无挂单...',
-    marketClosed: '⚠️ 轨道纠偏中：交易大厅暂时关闭', // 新增
+    marketClosed: '⚠️ 轨道纠偏中：交易大厅暂时关闭',
     seller: '指挥官:',
     cancelBtn: '终止',
     buyBtn: '对接',
@@ -69,7 +72,7 @@ const locales = {
     mintBtn: 'IGNITE (0.0005 ETH)',
     deployBtn: '+ DEPLOY ORDER',
     noOrders: 'DEEP SPACE IS QUIET...',
-    marketClosed: '⚠️ Maintenance: Market is currently closed', // 新增
+    marketClosed: '⚠️ Maintenance: Market is currently closed',
     seller: 'CMDR:',
     cancelBtn: 'ABORT',
     buyBtn: 'DOCK',
@@ -118,29 +121,33 @@ export default function Home() {
   const [sellPrice, setSellPrice] = useState('');
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !API_URL) return;
     const fetchData = async () => {
       try {
-        const resProgress = await fetch('http://localhost:3001/api/token/asteroid');
+        // 获取铸造进度
+        const resProgress = await fetch(`${API_URL}/api/token/asteroid`);
         const jsonProgress = await resProgress.json();
         if (jsonProgress.data) setProgress({ minted: jsonProgress.data.minted, max: jsonProgress.data.max });
 
         // 只有市场开启时才抓取订单
         if (IS_MARKET_ENABLED) {
-          const resOrders = await fetch('http://localhost:3001/api/market/orders');
+          const resOrders = await fetch(`${API_URL}/api/market/orders`);
           const jsonOrders = await resOrders.json();
           if (jsonOrders.data) setOrders(jsonOrders.data);
         }
         
+        // 获取用户余额
         if (address) {
-          const resBalance = await fetch(`http://localhost:3001/api/balance/${address}`);
+          const resBalance = await fetch(`${API_URL}/api/balance/${address}`);
           const jsonBalance = await resBalance.json();
           if (jsonBalance.success) {
             setUserBalance(jsonBalance.balance);
             setMintCount(jsonBalance.mintCount || 0);
           }
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
     };
 
     fetchData();
@@ -271,7 +278,6 @@ export default function Home() {
 
         {activeTab === 'market' && (
           <div className="animate-in fade-in zoom-in-95 duration-500">
-            {/* 🌟 市场开关逻辑 */}
             {!IS_MARKET_ENABLED ? (
               <div className="py-20 text-center flex flex-col items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
@@ -332,7 +338,7 @@ export default function Home() {
               <div>
                 <label className="block text-[10px] text-gray-500 mb-2 uppercase font-mono">{t.sellAmountLabel}</label>
                 <div className="relative">
-                  <input type="number" value={sellAmount} onChange={(e) => setSellAmount(e.target.value)} className="w-full bg-black border border-white/10 focus:border-orange-500 rounded-xl py-3.5 px-4 text-white outline-none font-mono text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder={t.sellAmountPlaceholder} />
+                  <input type="number" value={sellAmount} onChange={(e) => setSellAmount(e.target.value)} className="w-full bg-black border border-white/10 focus:border-orange-500 rounded-xl py-3.5 px-4 text-white outline-none font-mono text-sm [appearance:textfield]" placeholder={t.sellAmountPlaceholder} />
                   <button onClick={() => {
                       const maxK = Math.floor(userBalance / 1000);
                       if (maxK === 0) toast.error(t.toastMaxFail);
@@ -342,7 +348,7 @@ export default function Home() {
               </div>
               <div>
                 <label className="block text-[10px] text-gray-500 mb-2 uppercase font-mono">{t.priceLabel}</label>
-                <input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} className="w-full bg-black border border-white/10 focus:border-orange-500 rounded-xl py-3.5 px-4 text-white outline-none font-mono text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" placeholder={t.pricePlaceholder} />
+                <input type="number" value={sellPrice} onChange={(e) => setSellPrice(e.target.value)} className="w-full bg-black border border-white/10 focus:border-orange-500 rounded-xl py-3.5 px-4 text-white outline-none font-mono text-sm [appearance:textfield]" placeholder={t.pricePlaceholder} />
               </div>
             </div>
             <div className="flex gap-3">
