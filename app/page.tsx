@@ -16,7 +16,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const locales = {
   zh: {
     title: 'ASTEROID',
-    slogan: '第一个 on Base 的 ASTEROID 铭文',
+    slogan: '第一个Base链 ASTEROID 铭文',
     tabMint: '🚀 轨道发射',
     tabMarket: '🛒 星际枢纽',
     mintProgress: '发射舱容量',
