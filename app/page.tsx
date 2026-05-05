@@ -124,21 +124,26 @@ export default function Home() {
     if (!mounted || !API_URL) return;
     const fetchData = async () => {
       try {
-        // 获取铸造进度
-        const resProgress = await fetch(`${API_URL}/api/token/asteroid`);
+        // 🚀 配置跳过 Ngrok 警告页的 Header
+        const commonHeaders = {
+          'ngrok-skip-browser-warning': 'true'
+        };
+
+        // 1. 获取铸造进度
+        const resProgress = await fetch(`${API_URL}/api/token/asteroid`, { headers: commonHeaders });
         const jsonProgress = await resProgress.json();
         if (jsonProgress.data) setProgress({ minted: jsonProgress.data.minted, max: jsonProgress.data.max });
 
-        // 只有市场开启时才抓取订单
+        // 2. 只有市场开启时才抓取订单
         if (IS_MARKET_ENABLED) {
-          const resOrders = await fetch(`${API_URL}/api/market/orders`);
+          const resOrders = await fetch(`${API_URL}/api/market/orders`, { headers: commonHeaders });
           const jsonOrders = await resOrders.json();
           if (jsonOrders.data) setOrders(jsonOrders.data);
         }
         
-        // 获取用户余额
+        // 3. 获取用户余额
         if (address) {
-          const resBalance = await fetch(`${API_URL}/api/balance/${address}`);
+          const resBalance = await fetch(`${API_URL}/api/balance/${address}`, { headers: commonHeaders });
           const jsonBalance = await resBalance.json();
           if (jsonBalance.success) {
             setUserBalance(jsonBalance.balance);
